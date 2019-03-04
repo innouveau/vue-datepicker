@@ -2,12 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Vue get started</title>
+    <title>Vue Datepicker</title>
 
     <script defer src="https://use.fontawesome.com/releases/v5.7.2/js/all.js" integrity="sha384-0pzryjIRos8mFBWMzSSZApWtPl/5++eIfzYmTgBBmXYdhvxPc+XcFEk+zJwDgWbP" crossorigin="anonymous"></script>
 </head>
 <body>
-    <div id="app"></div>
+    <script>
+        window.datePickerBlockedDates = ['2019/3/20', '2019/4/17', '2019/4/18', '2019/4/19'];
+    </script>
+    <div id="app" lang="de" days="365" visible-months="2"></div>
 
     <script src="config.js"></script>
     <script src="bundle.js"></script>

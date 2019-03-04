@@ -10,6 +10,12 @@
             },
             canSlideNext() {
                 return this.$store.state.displayedFrame < (this.$store.state.availableMonths - 1);
+            },
+            canClear() {
+                return this.$store.state.start || this.$store.state.end;
+            },
+            eraseLabel() {
+                return this.$store.state.language === 'nl' ? 'Wissen' : 'Löschen';
             }
         },
         methods: {
@@ -22,6 +28,9 @@
                 if (this.canSlideNext) {
                     this.$store.commit('slideNext');
                 }
+            },
+            clear() {
+                this.$store.commit('clear');
             }
         }
     }
@@ -43,20 +52,28 @@
                 class="navigator__tool">
                 <i class="fas fa-arrow-right"></i>
             </div>
+            <div
+                @click="clear()"
+                v-if="canClear"
+                class="navigator__text-tool">{{eraseLabel}}</div>
         </div>
     </div>
 </template>
 
 
 <style lang="scss">
+    @import '@styles/variables.scss';
+
     .navigator {
         padding: 10px;
 
         .navigator__tools {
             display: flex;
+            align-items: center;
+            margin-right: 10px;
 
             .navigator__tool {
-                background: red;
+                background: $allowedColor;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -70,6 +87,17 @@
                 &.navigator__tool--disabled {
                     opacity: 0.5;
                     cursor: not-allowed;
+                }
+            }
+
+            .navigator__text-tool {
+                margin-left: auto;
+                cursor: pointer;
+                color: $allowedColor;
+                border-bottom: 1px solid transparent;
+
+                &:hover {
+                    border-bottom: 1px solid $allowedColor;
                 }
             }
         }

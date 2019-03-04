@@ -13,53 +13,78 @@
                 required: true
             }
         },
-        computed: {
-            isBlocked() {
-                return this.$store.getters['isBlocked'](this._getDate())
-            },
-            isStart() {
-                return isEqual(this.$store.state.start, this._getDate())
-            },
-            isEnd() {
-                return isEqual(this.$store.state.end, this._getDate())
-            },
-            isPartOfRange() {
-                let thisDay = this._getDate();
-                if (this.$store.state.start) {
-                    if (this.$store.state.end) {
-                        return isAfter(thisDay, this.$store.state.start) && isBefore(thisDay, this.$store.state.end);
-                    } else {
-                        return isAfter(thisDay, this.$store.state.start) && isBefore(thisDay, this.$store.state.tempEnd);
-                    }
-                }
+        data() {
+            return {
+                date: new Date(this.my.y + '/' + (this.my.m + 1) + '/' + this.day)
             }
         },
-        methods: {
-            _getDate() {
-                return new Date(this.my.y + '/' + (this.my.m + 1) + '/' + this.day);
+        computed: {
+            getEntry() {
+                return this.$store.getters['getEntry'](this.date);
             },
+            isBlocked() {
+                let entry = this.getEntry;
+                if (entry) {
+                    return entry.blocked;
+                } else {
+                    //
+                }
+            },
+            isStart() {
+                return isEqual(this.$store.state.start, this.date)
+            },
+            isEnd() {
+                return isEqual(this.$store.state.end, this.date)
+            },
+            isPartOfRangeSemi() {
+                let thisDay = this.date;
+                if (this.$store.state.start) {
+                    return isAfter(thisDay, this.$store.state.start) && isBefore(thisDay, this.$store.state.tempEnd) && this.isPossible;
+                } else {
+                    return false;
+                }
+            },
+            isPartOfRangeFull() {
+                let thisDay = this.date;
+                if (this.$store.state.start) {
+                    return isAfter(thisDay, this.$store.state.start) && isBefore(thisDay, this.$store.state.end);
+                }
+            },
+            isPossible() {
+                return this.$store.getters['isPossible'](this.date);
+            }
+
+        },
+        methods: {
             selectDay() {
-                if (!this.$store.state.lastClicked || this.$store.state.lastClicked === 'end') {
-                    if (this.$store.state.end && isAfter(this._getDate(), this.$store.state.end)) {
-                        this.$store.commit('setEnd', this._getDate());
+                if (this.isPossible) {
+                    if (!this.$store.state.lastClicked || this.$store.state.lastClicked === 'end') {
+                        if (this.$store.state.end && isAfter(this.date, this.$store.state.end)) {
+                            this.$store.commit('setEnd', this.date);
+                        } else {
+                            this.$store.commit('setStart', this.date);
+                        }
                     } else {
-                        this.$store.commit('setStart', this._getDate());
+
+                        if (this.$store.state.start && isBefore(this.date, this.$store.state.start)) {
+                            this.$store.commit('setEnd', this.$store.state.start);
+                            this.$store.commit('setStart', this.date);
+                        } else {
+                            this.$store.commit('setEnd', this.date);
+                        }
+
+
                     }
                 } else {
-
-                    if (this.$store.state.start && isBefore(this._getDate(), this.$store.state.start)) {
-                        this.$store.commit('setEnd', this.$store.state.start);
-                        this.$store.commit('setStart', this._getDate());
-                    } else {
-                        this.$store.commit('setEnd', this._getDate());
-                    }
-
-
+                    console.log('not possible');
                 }
+
             },
             hoverDay() {
                 if (!this.$store.state.end) {
-                    this.$store.commit('setTempEnd', this._getDate());
+
+
+                    this.$store.commit('setTempEnd', this.date);
                 }
             }
         }
@@ -71,15 +96,19 @@
     <div
         @click="selectDay()"
          @mouseover="hoverDay()"
-         :class="{'day--start': isStart,
+        :class="{'day--start': isStart,
                      'day--end': isEnd,
-                     'day--in-range': isPartOfRange,
-                     'day--blocked': isBlocked}"
+                     'day--in-range--semi': isPartOfRangeSemi,
+                     'day--in-range--full': isPartOfRangeFull,
+                     'day--blocked': isBlocked,
+                     'day--possible': isPossible}"
          class="day">{{day}}</div>
 </template>
 
 
 <style lang="scss">
+    @import '@styles/variables.scss';
+
     .day {
         width: 38px;
         height: 38px;
@@ -88,24 +117,33 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        cursor: pointer;
+        cursor: not-allowed;
+        transition: background-color 0.5s ease;
+
+        &:hover {
+            color: red;
+        }
 
         &.day--start {
-            background: red;
+            background: $allowedColor;
             color: #fff;
-            border-top-left-radius: 50%;
-            border-bottom-left-radius: 50%;
+            //border-top-left-radius: 50%;
+            //border-bottom-left-radius: 50%;
         }
 
         &.day--end {
-            background: red;
+            background: $allowedColor;
             color: #fff;
-            border-top-right-radius: 50%;
-            border-bottom-right-radius: 50%;
+            //border-top-right-radius: 50%;
+            //border-bottom-right-radius: 50%;
         }
 
-        &.day--in-range {
-            background: rgba(255,0,0,0.5);
+        &.day--in-range--semi {
+            background: $allowedColorSemi;
+        }
+
+        &.day--in-range--full {
+            background: $allowedColor;
         }
 
         &.day--blocked {
@@ -118,9 +156,15 @@
             }
         }
 
-        &:hover {
-            background: red;
-            color: #fff;
+        &.day--possible {
+
+            &:hover {
+                background: $allowedColor;
+                color: #fff;
+                cursor: pointer;
+            }
         }
+
+
     }
 </style>

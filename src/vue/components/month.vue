@@ -14,13 +14,15 @@
             }
         },
         data() {
-            let dayOfTheWeek = getDay(new Date(this.my.y + '/' + (this.my.m + 1) + '/1')) - 1;
+            let dayOfTheWeek, weekDays;
+            dayOfTheWeek = getDay(new Date(this.my.y + '/' + (this.my.m + 1) + '/1')) - 1;
+            weekDays = this.$store.state.language === 'nl' ? ['M', 'D', 'W', 'D', 'V', 'Z', 'Z'] : ['M', 'D', 'M', 'D', 'V', 'S', 'S']
             if (dayOfTheWeek === -1) {
                 dayOfTheWeek = 6;
             }
             return {
                 dayOfTheWeek: dayOfTheWeek,
-                weekDays: ['M', 'D', 'W', 'D', 'V', 'Z', 'Z']
+                weekDays: weekDays
             }
         },
         computed: {

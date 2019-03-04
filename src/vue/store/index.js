@@ -1,16 +1,28 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import {isEqual} from 'date-fns';
+import {isEqual, addDays, getDate, getMonth, getYear, differenceInCalendarMonths} from 'date-fns';
+import {dateToKey} from '@root/vue/tools';
 
 Vue.use(Vuex);
 
 let today = new Date();
 
 
+
 const getters = {
     monthName: (state) => (m) => {
-        const monthsDutch = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
-        return monthsDutch[m];
+        const monthsDutch = {
+            nl: ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'],
+            de: ['Januar','Februar','März', 'April','Mai','Juni', 'Juli','August','September', 'Oktober','November','Dezember']
+    };
+
+        return monthsDutch[state.language][m];
+    },
+    fullName: (state, getters) => (date) => {
+        let d, m;
+        d = getDate(date);
+        m = getMonth(date);
+        return d + ' ' + getters.monthName(m);
     },
     getMontshSet: (state) => () => {
         let n, set, m, y;
@@ -34,27 +46,46 @@ const getters = {
         }
         return set;
     },
-    isBlocked: (state) => (date) => {
-        for (let day of state.blockedDates) {
-            if (isEqual(date, day)) {
-                return true;
+    getIndex: (state) => (date) => {
+        let key, index;
+        key = dateToKey(date);
+        return state.datesDict[key];
+    },
+    getEntry: (state, getters) => (date) => {
+        let index = getters.getIndex(date);
+        return state.dates[index];
+    },
+    isPossible: (state, getters) => (date) => {
+        let indexStart, indexThis;
+        indexStart = getters.getIndex(state.start);
+        indexThis = getters.getIndex(date);
+        for (let i = indexStart; i < (indexThis + 1); i++) {
+            let entry = state.dates[i];
+            if (entry.blocked) {
+                return false;
             }
         }
-        return false;
+        return true;
     },
+
 };
 
 const state = {
-    blockedDates: [],
-    availableMonths: 24,
-    displayedFrame: 0,
-    today: today,
+    // configuration
+    totalDays: 0,
+    availableMonths: 0,
     thisMonth: today.getMonth(),
     thisYear: today.getFullYear(),
+    dates: [],
+    datesDict: {},
+    displayedFrame: 0,
+    today: today,
     start: null,
     end: null,
     tempEnd: null,
-    lastClicked: null
+    lastClicked: null,
+    language: '',
+    visibleMonths: 0
 };
 
 const actions = {
@@ -62,27 +93,50 @@ const actions = {
 };
 
 const mutations = {
-    prevMonth(state) {
-        state.thisMonth--;
-        if (state.thisMonth === -1) {
-            state.thisMonth = 11;
-            state.thisYear--;
+    init(state) {
+        let firstDayOfFirstMonth, newDate, key;
+        firstDayOfFirstMonth = new Date(state.thisYear + '/' + (state.thisMonth + 1) + '/1');
+
+
+
+        for (let i = 0; i < state.totalDays; i++) {
+            newDate = addDays(firstDayOfFirstMonth, i);
+            key = dateToKey(newDate);
+            state.dates.push(
+                {
+                    date: newDate,
+                    blocked: false
+                }
+            );
+            state.datesDict[key] = i;
+        }
+
+        state.availableMonths = differenceInCalendarMonths(state.dates[state.dates.length - 1].date, state.dates[0].date) + 1;
+    },
+    addBlockedDate(state, date) {
+        let key, index;
+        key = dateToKey(date);
+        if (state.datesDict[key]) {
+            index = state.datesDict[key];
+            state.dates[index].blocked = true;
         }
     },
-    nextMonth(state) {
-        state.thisMonth++;
-        if (state.thisMonth === 12) {
-            state.thisMonth = 0;
-            state.thisYear++;
-        }
+
+    clear(state) {
+        state.start = null;
+        state.end = null;
+        state.tempEnd = null;
+        state.lastClicked = null;
     },
     setStart(state, start) {
         state.start = start;
         state.lastClicked = 'start';
+        state.tempEnd = null;
     },
     setEnd(state, end) {
         state.end = end;
         state.lastClicked = 'end';
+        state.tempEnd = null;
     },
     setTempEnd(state, tempEnd) {
         state.tempEnd = tempEnd;
@@ -93,8 +147,14 @@ const mutations = {
     slidePrev(state) {
         state.displayedFrame--;
     },
-    addBlockedDate(state, date) {
-        state.blockedDates.push(date);
+    setLanguage(state, language) {
+        state.language = language;
+    },
+    setDays(state, days) {
+        state.totalDays = days;
+    },
+    setVisibleMonths(state, visibleMonths) {
+        state.visibleMonths = visibleMonths;
     }
 };
 

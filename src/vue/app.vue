@@ -1,11 +1,12 @@
 <script>
     import navigator from './components/navigator';
     import month from './components/month';
+    import book from './components/book';
 
     export default {
         name: 'app',
         components: {
-            navigator, month
+            navigator, month, book
         },
         methods: {
 
@@ -16,6 +17,9 @@
             },
             left() {
                 return -this.$store.state.displayedFrame * 300;
+            },
+            visibleMonths() {
+                return this.$store.state.visibleMonths;
             }
         }
     }
@@ -23,18 +27,22 @@
 
 
 <template>
-    <div class="app">
-        <navigator></navigator>
-        <div class="month__container">
-            <div
-                :style="{'left': left + 'px'}"
-                class="months__slider">
-                <month
-                        v-for="my in set"
-                        :my="my"></month>
+    <div class="date-picker">
+        <div
+            :style="{'width': (visibleMonths * 300) + 'px'}"
+            class="date-picker__container">
+            <navigator></navigator>
+            <div class="month__container">
+                <div
+                        :style="{'left': left + 'px'}"
+                        class="months__slider">
+                    <month
+                            v-for="my in set"
+                            :my="my"></month>
+                </div>
             </div>
-
         </div>
+        <book/>
     </div>
 </template>
 
@@ -43,28 +51,27 @@
     @import '@styles/index.scss';
     @import '@styles/variables.scss';
 
-    .app {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
+    .date-picker {
         font-family: 'Montserrat';
 
-        .month__container {
-            position: relative;
-            height: 290px;
+        .date-picker__container {
+            border: 1px solid #ddd;
             width: 600px;
-            overflow: hidden;
 
-            .months__slider {
-                display: flex;
-                position: absolute;
-                top: 0;
-                transition: left 0.3s ease;
+            .month__container {
+                position: relative;
+                height: 320px;
+                overflow: hidden;
+
+                .months__slider {
+                    display: flex;
+                    position: absolute;
+                    top: 0;
+                    transition: left 0.3s ease;
+
+                }
 
             }
-
         }
     }
 </style>
