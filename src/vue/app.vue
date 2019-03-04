@@ -13,6 +13,9 @@
         computed: {
             set() {
                 return this.$store.getters['getMontshSet']();
+            },
+            left() {
+                return -this.$store.state.displayedFrame * 300;
             }
         }
     }
@@ -23,7 +26,9 @@
     <div class="app">
         <navigator></navigator>
         <div class="month__container">
-            <div class="months__slider">
+            <div
+                :style="{'left': left + 'px'}"
+                class="months__slider">
                 <month
                         v-for="my in set"
                         :my="my"></month>
@@ -49,14 +54,13 @@
         .month__container {
             position: relative;
             height: 290px;
-            width: 900px;
+            width: 600px;
             overflow: hidden;
 
             .months__slider {
                 display: flex;
                 position: absolute;
                 top: 0;
-                left: -300px;
                 transition: left 0.3s ease;
 
             }

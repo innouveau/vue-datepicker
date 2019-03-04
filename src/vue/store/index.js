@@ -1,12 +1,10 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { format, formatDistance, formatRelative, subDays } from 'date-fns'
-
+import {isEqual} from 'date-fns';
 
 Vue.use(Vuex);
 
-let today, thisMonth;
-today = new Date();
+let today = new Date();
 
 
 const getters = {
@@ -15,16 +13,13 @@ const getters = {
         return monthsDutch[m];
     },
     getMontshSet: (state) => () => {
-        let set, m, y;
+        let n, set, m, y;
+        n = state.availableMonths;
         set = [];
         m = state.thisMonth;
         y = state.thisYear;
-        m = m - 2;
-        if (m < 0) {
-            m = m + 12;
-            y--;
-        }
-        for (let i = 0; i < 5; i++) {
+
+        for (let i = 0; i < n; i++) {
             let my;
             my = {
                 m: m,
@@ -38,10 +33,21 @@ const getters = {
             set.push(my);
         }
         return set;
-    }
+    },
+    isBlocked: (state) => (date) => {
+        for (let day of state.blockedDates) {
+            if (isEqual(date, day)) {
+                return true;
+            }
+        }
+        return false;
+    },
 };
 
 const state = {
+    blockedDates: [],
+    availableMonths: 24,
+    displayedFrame: 0,
     today: today,
     thisMonth: today.getMonth(),
     thisYear: today.getFullYear(),
@@ -80,6 +86,15 @@ const mutations = {
     },
     setTempEnd(state, tempEnd) {
         state.tempEnd = tempEnd;
+    },
+    slideNext(state) {
+        state.displayedFrame++;
+    },
+    slidePrev(state) {
+        state.displayedFrame--;
+    },
+    addBlockedDate(state, date) {
+        state.blockedDates.push(date);
     }
 };
 

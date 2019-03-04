@@ -5,14 +5,23 @@
 
         },
         computed: {
-
+            canSlidePrev() {
+                return this.$store.state.displayedFrame > 0;
+            },
+            canSlideNext() {
+                return this.$store.state.displayedFrame < (this.$store.state.availableMonths - 1);
+            }
         },
         methods: {
             prevMonth() {
-                this.$store.commit('prevMonth');
+                if (this.canSlidePrev) {
+                    this.$store.commit('slidePrev');
+                }
             },
             nextMonth() {
-                this.$store.commit('nextMonth');
+                if (this.canSlideNext) {
+                    this.$store.commit('slideNext');
+                }
             }
         }
     }
@@ -24,11 +33,13 @@
         <div class="navigator__tools">
             <div
                 @click="prevMonth()"
+                :class="{'navigator__tool--disabled': !canSlidePrev}"
                 class="navigator__tool">
                 <i class="fas fa-arrow-left"></i>
             </div>
             <div
                 @click="nextMonth()"
+                :class="{'navigator__tool--disabled': !canSlideNext}"
                 class="navigator__tool">
                 <i class="fas fa-arrow-right"></i>
             </div>
@@ -55,6 +66,11 @@
                 border-radius: 50%;
                 margin-right: 4px;
                 cursor: pointer;
+
+                &.navigator__tool--disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
             }
         }
     }
