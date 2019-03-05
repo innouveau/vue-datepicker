@@ -20,6 +20,9 @@
             },
             visibleMonths() {
                 return this.$store.state.visibleMonths;
+            },
+            feedback() {
+                return this.$store.state.feedback;
             }
         }
     }
@@ -43,6 +46,9 @@
                         :month-key="index"></month>
                 </div>
             </div>
+            <div class="feedback">
+                {{feedback}}
+            </div>
         </div>
         <book/>
     </div>
@@ -59,6 +65,7 @@
         .date-picker__container {
             border: 1px solid #ddd;
             width: 600px;
+            height: 405px;
 
             .month__container {
                 position: relative;
@@ -73,6 +80,11 @@
 
                 }
 
+            }
+
+            .feedback {
+                padding: 10px;
+                color: #888;
             }
         }
     }

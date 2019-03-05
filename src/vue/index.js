@@ -6,20 +6,22 @@ import app from './app';
 
 
 new Vue({
-    el: '#app',
+    el: '#datepicker',
     store,
     components: {
         app
     },
     template: '<app/>',
     beforeMount: function () {
-        let lang, days, visibleMonths;
+        let lang, days, visibleMonths, minimalPeriod;
         lang = this.$el.attributes['lang'].value;
         days = Number(this.$el.attributes['days'].value);
         visibleMonths = Number(this.$el.attributes['visible-months'].value);
+        minimalPeriod = Number(this.$el.attributes['minimal-period'].value);
         store.commit('setLanguage', lang);
         store.commit('setDays', days);
         store.commit('setVisibleMonths', visibleMonths);
+        store.commit('setMinimalPeriod', minimalPeriod);
 
         store.commit('init');
 

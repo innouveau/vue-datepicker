@@ -43,7 +43,7 @@
             },
             isPartOfRangeSemi() {
                 if (this.$store.state.start !== null && this.$store.state.end === null && this.$store.state.tempEnd !== null) {
-                    return isInBetween(this.dayIndex, this.$store.state.start, this.$store.state.tempEnd) && this.isPossible;
+                    return isInBetween(this.dayIndex, this.$store.state.start, this.$store.state.tempEnd) && this.isPossibleInbetween;
                 } else {
                     return false;
                 }
@@ -53,13 +53,24 @@
                     return isInBetween(this.dayIndex, this.$store.state.start, this.$store.state.end);
                 }
             },
-            isPossible() {
-                return this.$store.getters['isPossible'](this.dayIndex);
-            }
+            isPossibleInbetween() {
+                return this.$store.getters['isPossibleInbetween'](this.dayIndex);
+            },
+            isPossibleAsEdge() {
+                // not so nice way of returning true OR feedback string...
+                let result = this.$store.getters['isPossibleAsEdge'](this.dayIndex);
+                if (result === true) {
+                    return true;
+                } else {
+                    return result
+                }
+            },
         },
         methods: {
             selectDay() {
-                if (this.isPossible) {
+                let result = this.isPossibleAsEdge;
+                if (result === true) {
+                    this.$store.commit('setFeedback', '');
                     // nothing set yet
                     if (this.$store.state.start === null) {
                         this.$store.commit('setStart', this.dayIndex);
@@ -79,7 +90,19 @@
                         }
                     }
                 } else {
-                    console.log('not possible');
+                    let dictionary = {
+                        nl: {
+                            tooShortPeriod: 'Periode te kort',
+                            dateBlocked: 'Datum is bezet',
+                            dateBlockedInBetween: 'Er is een bezette datum in deze periode'
+                        },
+                        de: {
+                            tooShortPeriod: 'Zeitraum zu kurz',
+                            dateBlocked: 'Datum ist bereits belegt',
+                            dateBlockedInBetween: 'In der Periode gibt es ein Datum das bereits belegt ist'
+                        }
+                    };
+                    this.$store.commit('setFeedback', dictionary[this.$store.state.language][result]);
                 }
 
             },
@@ -102,11 +125,8 @@
                      'day--in-range--semi': isPartOfRangeSemi,
                      'day--in-range--full': isPartOfRangeFull,
                      'day--blocked': isBlocked,
-                     'day--possible': isPossible}"
-         class="day">{{day}}
-            <div class="tiny">
-                {{dayIndex}}
-            </div></div>
+                     'day--possible': (isPossibleAsEdge === true)}"
+         class="day">{{day}}</div>
 </template>
 
 

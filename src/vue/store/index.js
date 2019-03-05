@@ -54,9 +54,13 @@ const getters = {
         let index = getters.getIndex(date);
         return state.dates[index];
     },
-    isPossible: (state) => (dayIndex) => {
+    isPossibleAsEdge: (state) => (dayIndex) => {
         let highest, lowest;
         if (state.start) {
+            if (Math.abs(state.start - dayIndex) < state.minimalPeriod) {
+                return 'tooShortPeriod';
+            }
+
             if (dayIndex > state.start) {
                 highest = dayIndex;
                 lowest = state.start;
@@ -67,14 +71,36 @@ const getters = {
 
             for (let i = lowest; i < (highest + 1); i++) {
                 let entry = state.dates[i];
-                if (entry.blocked) {
-                    return false;
+                if (entry && entry.blocked) {
+                    return 'dateBlockedInBetween';
                 }
             }
             return true;
         } else {
-            return !state.dates[dayIndex].blocked;
+             if (state.dates[dayIndex] && state.dates[dayIndex].blocked) {
+                return 'dateBlocked';
+             } else {
+                return true;
+             }
         }
+    },
+    isPossibleInbetween: (state) => (dayIndex) => {
+        let highest, lowest;
+        if (dayIndex > state.start) {
+            highest = dayIndex;
+            lowest = state.start;
+        } else {
+            lowest = dayIndex;
+            highest = state.start;
+        }
+
+        for (let i = lowest; i < (highest + 1); i++) {
+            let entry = state.dates[i];
+            if (entry && entry.blocked) {
+                return false;
+            }
+        }
+        return true;
     }
 };
 
@@ -92,7 +118,9 @@ const state = {
     end: null,
     tempEnd: null,
     language: '',
-    visibleMonths: 0
+    visibleMonths: 0,
+    minimalPeriod: 0,
+    feedback: ''
 };
 
 const actions = {
@@ -128,7 +156,9 @@ const mutations = {
             state.dates[index].blocked = true;
         }
     },
-
+    setFeedback(state, feedback) {
+        state.feedback = feedback;
+    },
     clear(state) {
         state.start = null;
         state.end = null;
@@ -159,6 +189,9 @@ const mutations = {
     },
     setVisibleMonths(state, visibleMonths) {
         state.visibleMonths = visibleMonths;
+    },
+    setMinimalPeriod(state, minimalPeriod) {
+        state.minimalPeriod = minimalPeriod;
     }
 };
 
