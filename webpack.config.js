@@ -4,7 +4,7 @@ module.exports = {
     entry: './src/vue/index.js',
     output: {
         path: path.resolve(__dirname, './dist'),
-        filename: 'bundle.js'
+        filename: 'datepicker.js'
     },
     mode: 'development',
     watch: true,

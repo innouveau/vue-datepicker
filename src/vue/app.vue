@@ -60,7 +60,7 @@
     @import '@styles/variables.scss';
 
     .date-picker {
-        font-family: 'Montserrat';
+        font-family: inherit;
 
         .date-picker__container {
             border: 1px solid #ddd;

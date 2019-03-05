@@ -88,6 +88,25 @@
                     opacity: 0.5;
                     cursor: not-allowed;
                 }
+
+                i {
+                    font-size: 26px;
+                    margin-bottom: 3px;
+
+                    &.fa-arrow-left {
+
+                        &:after {
+                            content: '←';
+                        }
+                    }
+
+                    &.fa-arrow-right {
+
+                        &:after {
+                            content: '→';
+                        }
+                    }
+                }
             }
 
             .navigator__text-tool {
