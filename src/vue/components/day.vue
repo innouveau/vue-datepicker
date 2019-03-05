@@ -1,5 +1,6 @@
 <script>
     import {isEqual, isBefore, isAfter} from 'date-fns';
+    import {isInBetween} from '@root/vue/tools';
 
     export default {
         name: 'day',
@@ -11,69 +12,71 @@
             day: {
                 type: Number,
                 required: true
+            },
+            doCalculations: {
+                type: Boolean,
+                required: true
             }
         },
         data() {
+            let date,dayIndex;
+            date = new Date(this.my.y + '/' + (this.my.m + 1) + '/' + this.day);
+            dayIndex = this.$store.getters['getIndex'](date);
             return {
-                date: new Date(this.my.y + '/' + (this.my.m + 1) + '/' + this.day)
+                date: date,
+                dayIndex: dayIndex
             }
         },
         computed: {
-            getEntry() {
-                return this.$store.getters['getEntry'](this.date);
+            _getEntry() {
+                return this.$store.state.dates[this.dayIndex];
             },
             isBlocked() {
-                let entry = this.getEntry;
-                if (entry) {
-                    return entry.blocked;
-                } else {
-                    //
-                }
+                let entry = this._getEntry;
+                return entry && entry.blocked;
             },
             isStart() {
-                return isEqual(this.$store.state.start, this.date)
+                return this.$store.state.start === this.dayIndex;
             },
             isEnd() {
-                return isEqual(this.$store.state.end, this.date)
+                return this.$store.state.end === this.dayIndex;
             },
             isPartOfRangeSemi() {
-                let thisDay = this.date;
-                if (this.$store.state.start) {
-                    return isAfter(thisDay, this.$store.state.start) && isBefore(thisDay, this.$store.state.tempEnd) && this.isPossible;
+                if (this.$store.state.start !== null && this.$store.state.end === null && this.$store.state.tempEnd !== null) {
+                    return isInBetween(this.dayIndex, this.$store.state.start, this.$store.state.tempEnd) && this.isPossible;
                 } else {
                     return false;
                 }
             },
             isPartOfRangeFull() {
-                let thisDay = this.date;
-                if (this.$store.state.start) {
-                    return isAfter(thisDay, this.$store.state.start) && isBefore(thisDay, this.$store.state.end);
+                if (this.$store.state.start !== null && this.$store.state.end !== null) {
+                    return isInBetween(this.dayIndex, this.$store.state.start, this.$store.state.end);
                 }
             },
             isPossible() {
-                return this.$store.getters['isPossible'](this.date);
+                return this.$store.getters['isPossible'](this.dayIndex);
             }
-
         },
         methods: {
             selectDay() {
                 if (this.isPossible) {
-                    if (!this.$store.state.lastClicked || this.$store.state.lastClicked === 'end') {
-                        if (this.$store.state.end && isAfter(this.date, this.$store.state.end)) {
-                            this.$store.commit('setEnd', this.date);
-                        } else {
-                            this.$store.commit('setStart', this.date);
-                        }
+                    // nothing set yet
+                    if (this.$store.state.start === null) {
+                        this.$store.commit('setStart', this.dayIndex);
                     } else {
-
-                        if (this.$store.state.start && isBefore(this.date, this.$store.state.start)) {
-                            this.$store.commit('setEnd', this.$store.state.start);
-                            this.$store.commit('setStart', this.date);
+                        // both set: reset
+                        if (this.$store.state.end !== null) {
+                            this.$store.commit('setEnd', null);
+                            this.$store.commit('setStart', this.dayIndex);
                         } else {
-                            this.$store.commit('setEnd', this.date);
+                            // normal end
+                            if (this.$store.state.start !== null && this.dayIndex < this.$store.state.start) {
+                                this.$store.commit('setEnd', this.$store.state.start);
+                                this.$store.commit('setStart', this.dayIndex);
+                            } else {
+                                this.$store.commit('setEnd', this.dayIndex);
+                            }
                         }
-
-
                     }
                 } else {
                     console.log('not possible');
@@ -82,9 +85,7 @@
             },
             hoverDay() {
                 if (!this.$store.state.end) {
-
-
-                    this.$store.commit('setTempEnd', this.date);
+                    this.$store.commit('setTempEnd', this.dayIndex);
                 }
             }
         }
@@ -102,7 +103,10 @@
                      'day--in-range--full': isPartOfRangeFull,
                      'day--blocked': isBlocked,
                      'day--possible': isPossible}"
-         class="day">{{day}}</div>
+         class="day">{{day}}
+            <div class="tiny">
+                {{dayIndex}}
+            </div></div>
 </template>
 
 
@@ -119,6 +123,11 @@
         align-items: center;
         cursor: not-allowed;
         transition: background-color 0.5s ease;
+
+        .tiny {
+            font-size: 8px;
+            margin-left: 2px;
+        }
 
         &:hover {
             color: red;

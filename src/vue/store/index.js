@@ -47,27 +47,35 @@ const getters = {
         return set;
     },
     getIndex: (state) => (date) => {
-        let key, index;
-        key = dateToKey(date);
+        let key = dateToKey(date);
         return state.datesDict[key];
     },
     getEntry: (state, getters) => (date) => {
         let index = getters.getIndex(date);
         return state.dates[index];
     },
-    isPossible: (state, getters) => (date) => {
-        let indexStart, indexThis;
-        indexStart = getters.getIndex(state.start);
-        indexThis = getters.getIndex(date);
-        for (let i = indexStart; i < (indexThis + 1); i++) {
-            let entry = state.dates[i];
-            if (entry.blocked) {
-                return false;
+    isPossible: (state) => (dayIndex) => {
+        let highest, lowest;
+        if (state.start) {
+            if (dayIndex > state.start) {
+                highest = dayIndex;
+                lowest = state.start;
+            } else {
+                lowest = dayIndex;
+                highest = state.start;
             }
-        }
-        return true;
-    },
 
+            for (let i = lowest; i < (highest + 1); i++) {
+                let entry = state.dates[i];
+                if (entry.blocked) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return !state.dates[dayIndex].blocked;
+        }
+    }
 };
 
 const state = {
@@ -83,7 +91,6 @@ const state = {
     start: null,
     end: null,
     tempEnd: null,
-    lastClicked: null,
     language: '',
     visibleMonths: 0
 };
@@ -126,16 +133,13 @@ const mutations = {
         state.start = null;
         state.end = null;
         state.tempEnd = null;
-        state.lastClicked = null;
     },
     setStart(state, start) {
         state.start = start;
-        state.lastClicked = 'start';
         state.tempEnd = null;
     },
     setEnd(state, end) {
         state.end = end;
-        state.lastClicked = 'end';
         state.tempEnd = null;
     },
     setTempEnd(state, tempEnd) {

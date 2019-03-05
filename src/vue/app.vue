@@ -37,8 +37,10 @@
                         :style="{'left': left + 'px'}"
                         class="months__slider">
                     <month
-                            v-for="my in set"
-                            :my="my"></month>
+                        v-for="(my, index) in set"
+                        :my="my"
+                        :key="index"
+                        :month-key="index"></month>
                 </div>
             </div>
         </div>

@@ -3,17 +3,19 @@
         name: 'book',
         computed: {
             rangeString() {
-                let string, start, end;
+                let string, start, end, startDate, endDate;
                 string = '';
                 start = this.$store.state.start;
                 end = this.$store.state.end;
-                if (start) {
+                if (start !== null) {
+                    startDate = this.$store.state.dates[start].date;
                     string += this.$store.state.language === 'nl' ? 'Van ' : 'Von ';
-                    string += this.$store.getters['fullName'](start);
+                    string += this.$store.getters['fullName'](startDate);
                 }
-                if (end) {
+                if (end !== null) {
+                    endDate = this.$store.state.dates[end].date;
                     string += this.$store.state.language === 'nl' ? ' t/m ' : ' bis einschließlich ';
-                    string += this.$store.getters['fullName'](end);
+                    string += this.$store.getters['fullName'](endDate);
                 }
                 return string;
             },

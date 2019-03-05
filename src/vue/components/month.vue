@@ -11,6 +11,9 @@
             my: {
                 type: Object,
                 required: true
+            },
+            monthKey: {
+                type: Number
             }
         },
         data() {
@@ -37,15 +40,17 @@
                 }
                 return days;
             },
+            doCalculations() {
+                let displayedFrame, visibleMonths;
+                displayedFrame = this.$store.state.displayedFrame;
+                visibleMonths = this.$store.state.visibleMonths;
+                return this.monthKey >= (displayedFrame - 1) && this.monthKey < (displayedFrame + visibleMonths + 1);
+            },
 
             // label
             month() {
                 return this.$store.getters['monthName'](this.my.m);
             }
-        },
-        methods: {
-
-
         }
     }
 </script>
@@ -61,13 +66,14 @@
                 v-for="d in weekDays"
                 class="week__day">{{d}}</div>
         </div>
-        <div class="month__days">
+        <div class="month__days" v-if="doCalculations">
             <div
                 :style="{'width': (dayOfTheWeek * 40) + 'px'}"
                 class="spacer"></div>
             <day
                 v-for="(day, index) in days"
                 :key="index"
+                :do-calculations="doCalculations"
                 :my="my"
                 :day="day"/>
         </div>
