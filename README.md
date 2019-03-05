@@ -4,6 +4,9 @@
 
 - include `<div id="datepicker" lang="nl" days="365" visible-months="2" minimal-period="3"></div>` on your page.
 - include `<script src="datepicker.js"></script>` on bottom of page.
+- include `<script> window.datePickerBlockedDates = [ '2019/3/20', '2019/4/17',];  </script>`
+These are the dates that will be unavailable. This should be put before the `datepicker.js` script tag.
+
 
 ## Options
 
