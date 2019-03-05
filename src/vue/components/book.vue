@@ -25,6 +25,14 @@
             bookLabel() {
                 return this.$store.state.language === 'nl' ? 'Reserveren' : 'Reservieren';
             }
+        },
+        methods: {
+            book() {
+                let start, end;
+                start = this.$store.getters['dateFormate'](this.$store.state.dates[this.$store.state.start].date);
+                end = this.$store.getters['dateFormate'](this.$store.state.dates[this.$store.state.end].date);
+                window.location.href = this.$store.state.action + '?start=' + start + '&end=' + end;
+            }
         }
     }
 </script>
@@ -37,7 +45,10 @@
         </div>
 
         <div class="book__tools">
-            <div v-if="canBook" class="action-button">
+            <div
+                v-if="canBook"
+                @click="book()"
+                class="action-button">
                 {{bookLabel}}
             </div>
         </div>

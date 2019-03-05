@@ -24,6 +24,13 @@ const getters = {
         m = getMonth(date);
         return d + ' ' + getters.monthName(m);
     },
+    dateFormate: (state) => (date) => {
+        let d, m, y;
+        d = getDate(date);
+        m = getMonth(date);
+        y = getYear(date);
+        return y + '-' + m + '-' + d;
+    },
     getMontshSet: (state) => () => {
         let n, set, m, y;
         n = state.availableMonths;
@@ -120,7 +127,8 @@ const state = {
     language: '',
     visibleMonths: 0,
     minimalPeriod: 0,
-    feedback: ''
+    feedback: '',
+    action: ''
 };
 
 const actions = {
@@ -192,6 +200,9 @@ const mutations = {
     },
     setMinimalPeriod(state, minimalPeriod) {
         state.minimalPeriod = minimalPeriod;
+    },
+    setAction(state, action) {
+        state.action = action;
     }
 };
 
