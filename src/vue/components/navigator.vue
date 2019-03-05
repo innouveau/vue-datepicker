@@ -66,11 +66,12 @@
 
     .navigator {
         padding: 10px;
+        height: 50px;
 
         .navigator__tools {
             display: flex;
             align-items: center;
-            margin-right: 10px;
+            height: 100%;
 
             .navigator__tool {
                 background: $allowedColor;

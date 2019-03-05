@@ -20,7 +20,7 @@
                 return string;
             },
             canBook() {
-                return this.$store.state.start && this.$store.state.end;
+                return this.$store.state.start !== null && this.$store.state.end !== null;
             },
             bookLabel() {
                 return this.$store.state.language === 'nl' ? 'Reserveren' : 'Reservieren';
