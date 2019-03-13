@@ -72,7 +72,7 @@
 
             .action-button {
                 padding: 8px 12px;
-                background: #FF6D33;
+                background: red;
                 border-radius: 5px;
                 color: #fff;
                 cursor: pointer;
@@ -81,7 +81,7 @@
                 display: inline-block;
 
                 &:hover {
-                    background: #D85425;
+                    background: rgb(200,0,0);
                 }
             }
         }
