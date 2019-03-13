@@ -65,7 +65,7 @@
         .date-picker__container {
             border: 1px solid #ddd;
             width: 600px;
-            height: 405px;
+            height: 420px;
 
             .month__container {
                 position: relative;
@@ -85,6 +85,7 @@
             .feedback {
                 padding: 10px;
                 color: #888;
+                height: 50px;
             }
         }
     }
