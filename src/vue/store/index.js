@@ -159,7 +159,7 @@ const mutations = {
     addBlockedDate(state, date) {
         let key, index;
         key = dateToKey(date);
-        if (state.datesDict[key]) {
+        if (state.datesDict.hasOwnProperty(key)) {
             index = state.datesDict[key];
             state.dates[index].blocked = true;
         }

@@ -4,7 +4,7 @@ import {isBefore, isAfter, getDate, getMonth, getYear} from "date-fns";
 const dateToKey = (date) => {
     let d, m, y;
     d = getDate(date);
-    m = getMonth(date);
+    m = getMonth(date) + 1;
     y = getYear(date);
     return y + '-' + m + '-' + d;
 };
